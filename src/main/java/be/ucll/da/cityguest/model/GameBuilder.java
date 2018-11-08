@@ -43,12 +43,6 @@ class GameBuilder {
     }
 
     public Game build() {
-        var game = new Game();
-        game.setCoordinates(coordinates);
-        game.setDescription(description);
-        game.setLocation(location);
-        game.setName(name);
-        game.setQuestions(questions);
-        return game;
+        return new Game(name, location, coordinates, description, questions);
     }
 }

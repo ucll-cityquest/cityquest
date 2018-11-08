@@ -22,7 +22,7 @@ public class Game {
     @OneToMany
     private List<Question> questions;
 
-    Game() {
+    private Game() {
     }
 
     public Game(String name, String location, Coordinates coordinates, String description, List<Question> questions) {
@@ -30,26 +30,6 @@ public class Game {
         this.location = location;
         this.coordinates = coordinates;
         this.description = description;
-        this.questions = questions;
-    }
-
-    void setName(String name) {
-        this.name = name;
-    }
-
-    void setLocation(String location) {
-        this.location = location;
-    }
-
-    void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    void setDescription(String description) {
-        this.description = description;
-    }
-
-    void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
 
