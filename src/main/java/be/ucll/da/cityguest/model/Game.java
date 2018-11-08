@@ -16,10 +16,10 @@ public class Game {
 
     private String description;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Coordinates coordinates;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Question> questions;
 
     private Game() {

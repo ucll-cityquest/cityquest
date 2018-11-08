@@ -1,13 +1,15 @@
 package be.ucll.da.cityguest.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-class GameBuilder {
+public class GameBuilder {
     private String name;
     private String location;
     private String description;
     private Coordinates coordinates;
-    private List<Question> questions;
+    private List<Question> questions = new ArrayList<>();
 
     private GameBuilder() {
 
@@ -34,6 +36,13 @@ class GameBuilder {
 
     public GameBuilder setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
+        return this;
+    }
+
+    public GameBuilder addQuestion(Function<QuestionBuilder, QuestionBuilder> questionBuilderFunction) {
+        var question = questionBuilderFunction.apply(QuestionBuilder.aQuestion())
+                .build();
+        this.questions.add(question);
         return this;
     }
 

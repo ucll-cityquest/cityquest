@@ -34,6 +34,11 @@ public class QuestionBuilder {
         return this;
     }
 
+    public QuestionBuilder addAnswer(String answer) {
+        this.answers.add(answer);
+        return this;
+    }
+    
     public QuestionBuilder setAnswers(List<String> answers) {
         this.answers = answers;
         return this;
