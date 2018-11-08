@@ -1,14 +1,13 @@
 package be.ucll.da.cityguest.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 public class Question {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String question;
@@ -17,9 +16,10 @@ public class Question {
     private Coordinates coordinates;
 
     @ElementCollection
-    private List<String> answers = new ArrayList<>();
+    private List<String> answers;
 
     private int correctAnswer;
+
     private String extraInfo;
 
     private Question() {
@@ -33,23 +33,27 @@ public class Question {
         this.extraInfo = extraInfo;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public UUID getId() {
+        return id;
     }
 
-    public void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
+    public String getQuestion() {
+        return question;
     }
 
-    public void setAnswers(List<String> answers) {
-        this.answers = answers;
+    public Coordinates getCoordinates() {
+        return coordinates;
     }
 
-    public void setCorrectAnswer(int correctAnswer) {
-        this.correctAnswer = correctAnswer;
+    public List<String> getAnswers() {
+        return answers;
     }
 
-    public void setExtraInfo(String extraInfo) {
-        this.extraInfo = extraInfo;
+    public int getCorrectAnswer() {
+        return correctAnswer;
+    }
+
+    public String getExtraInfo() {
+        return extraInfo;
     }
 }
