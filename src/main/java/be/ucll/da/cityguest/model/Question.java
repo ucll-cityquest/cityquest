@@ -1,12 +1,24 @@
 package be.ucll.da.cityguest.model;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+@Entity
 public class Question {
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private UUID id;
+
     private String question;
+
+    @OneToOne
     private Coordinates coordinates;
+
+    @ElementCollection
     private List<String> answers = new ArrayList<>();
+
     private int correctAnswer;
     private String extraInfo;
 
