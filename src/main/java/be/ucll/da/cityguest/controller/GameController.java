@@ -12,8 +12,7 @@ import java.util.List;
 public class GameController {
     private final GameRepository gameRepository;
 
-    @Autowired
-    public GameController(GameRepository gameRepository) {
+    public GameController(@Autowired GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
 

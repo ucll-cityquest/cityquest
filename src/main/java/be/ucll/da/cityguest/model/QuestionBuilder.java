@@ -38,7 +38,7 @@ public class QuestionBuilder {
         this.answers.add(answer);
         return this;
     }
-    
+
     public QuestionBuilder setAnswers(List<String> answers) {
         this.answers = answers;
         return this;
