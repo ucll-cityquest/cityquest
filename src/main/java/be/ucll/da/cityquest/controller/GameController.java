@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @RestController
 public class GameController {
     private final GameRepository gameRepository;
@@ -18,6 +20,13 @@ public class GameController {
 
     @RequestMapping("/games")
     public List<Game> game() {
-        return gameRepository.findAll();
+        return gameRepository
+                .findAll()
+                .stream()
+                .peek(game ->
+                        // We want no questions in the json response
+                        game.getQuestions().clear()
+                )
+                .collect(toList());
     }
 }
