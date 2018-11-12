@@ -1,6 +1,6 @@
-package be.ucll.da.cityguest.database;
+package be.ucll.da.cityquest.database;
 
-import be.ucll.da.cityguest.model.Game;
+import be.ucll.da.cityquest.model.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

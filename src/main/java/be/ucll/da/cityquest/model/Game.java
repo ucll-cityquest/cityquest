@@ -1,4 +1,4 @@
-package be.ucll.da.cityguest.model;
+package be.ucll.da.cityquest.model;
 
 import javax.persistence.*;
 import java.util.List;

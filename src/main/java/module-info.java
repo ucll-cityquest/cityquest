@@ -1,5 +1,5 @@
 /*
-Disable for now since I could not get it to work
+Disable for now since I could not get it to work.
 open module cityquest {
     requires spring.boot;
     requires spring.boot.autoconfigure;

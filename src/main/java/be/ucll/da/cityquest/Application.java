@@ -1,13 +1,12 @@
-package be.ucll.da.cityguest;
-import be.ucll.da.cityguest.database.GameRepository;
-import be.ucll.da.cityguest.model.Coordinates;
-import org.springframework.beans.factory.annotation.Autowired;
+package be.ucll.da.cityquest;
+import be.ucll.da.cityquest.database.GameRepository;
+import be.ucll.da.cityquest.model.Coordinates;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import static be.ucll.da.cityguest.model.GameBuilder.aGame;
+import static be.ucll.da.cityquest.model.GameBuilder.aGame;
 
 @SpringBootApplication
 public class Application {

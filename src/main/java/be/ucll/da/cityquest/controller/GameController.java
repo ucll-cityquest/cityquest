@@ -1,7 +1,7 @@
-package be.ucll.da.cityguest.controller;
+package be.ucll.da.cityquest.controller;
 
-import be.ucll.da.cityguest.database.GameRepository;
-import be.ucll.da.cityguest.model.Game;
+import be.ucll.da.cityquest.database.GameRepository;
+import be.ucll.da.cityquest.model.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
