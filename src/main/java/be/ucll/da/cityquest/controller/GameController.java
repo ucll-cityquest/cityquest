@@ -3,6 +3,8 @@ package be.ucll.da.cityquest.controller;
 import be.ucll.da.cityquest.database.GameRepository;
 import be.ucll.da.cityquest.model.Game;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,5 +30,10 @@ public class GameController {
                         game.getQuestions().clear()
                 )
                 .collect(toList());
+    }
+
+    @PostMapping("/games")
+    public void addGame(@RequestBody Game game) {
+        gameRepository.save(game);
     }
 }

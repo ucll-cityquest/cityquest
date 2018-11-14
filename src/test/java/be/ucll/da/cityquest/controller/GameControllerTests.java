@@ -16,7 +16,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static be.ucll.da.cityquest.model.GameBuilder.aGame;
-import static be.ucll.da.cityquest.model.QuestionBuilder.aQuestion;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
