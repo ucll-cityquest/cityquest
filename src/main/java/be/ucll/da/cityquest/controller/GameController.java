@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -32,7 +33,7 @@ public class GameController {
     }
 
     @PostMapping("/games")
-    public void addGame(@RequestBody Game game) {
+    public void addGame(@Valid @RequestBody Game game) {
         gameRepository.save(game);
     }
 }
