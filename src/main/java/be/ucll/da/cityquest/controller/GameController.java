@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toList;
 public class GameController {
     private final GameRepository gameRepository;
 
-    public GameController(@Autowired GameRepository gameRepository) {
+    public GameController(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import static be.ucll.da.cityquest.model.QuestionBuilder.aQuestion;
+
 public class GameBuilder {
     private String name;
     private String location;
@@ -40,7 +42,7 @@ public class GameBuilder {
     }
 
     public GameBuilder addQuestion(Function<QuestionBuilder, QuestionBuilder> questionBuilderFunction) {
-        var question = questionBuilderFunction.apply(QuestionBuilder.aQuestion())
+        var question = questionBuilderFunction.apply(aQuestion())
                 .build();
         this.questions.add(question);
         return this;
