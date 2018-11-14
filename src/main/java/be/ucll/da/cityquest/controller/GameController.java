@@ -2,13 +2,12 @@ package be.ucll.da.cityquest.controller;
 
 import be.ucll.da.cityquest.database.GameRepository;
 import be.ucll.da.cityquest.model.Game;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
 
@@ -35,5 +34,15 @@ public class GameController {
     @PostMapping("/games")
     public void addGame(@Valid @RequestBody Game game) {
         gameRepository.save(game);
+    }
+
+    @GetMapping("/games/{id}")
+    public Game retrieveGame(@PathVariable UUID id) {
+        Optional<Game> game = gameRepository.findById(id);
+
+        if (!game.isPresent())
+            throw new EntityNotFoundException("Game with id: " + id);
+
+        return game.get();
     }
 }
