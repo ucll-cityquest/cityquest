@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.UUID;
 
 @Entity
@@ -12,7 +14,12 @@ public class Coordinates {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Min(-90)
+    @Max(90)
     private double lat;
+
+    @Min(-180)
+    @Max(180)
     private double lng;
 
     private Coordinates() {

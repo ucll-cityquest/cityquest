@@ -1,6 +1,9 @@
 package be.ucll.da.cityquest.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,17 +13,24 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @NotNull
+    @NotEmpty
     private String question;
 
+    @NotNull
+    private String extraInfo;
+
     @OneToOne(cascade = CascadeType.ALL)
+    @NotNull
     private Coordinates coordinates;
 
     @ElementCollection
+    @NotNull
+    @NotEmpty
     private List<String> answers;
 
+    @Min(0)
     private int correctAnswer;
-
-    private String extraInfo;
 
     private Question() {
     }

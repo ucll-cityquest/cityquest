@@ -1,6 +1,8 @@
 package be.ucll.da.cityquest.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,16 +12,24 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @NotNull
+    @NotEmpty
     private String name;
 
+    @NotNull
+    @NotEmpty
     private String location;
 
+    @NotNull
+    @NotEmpty
     private String description;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @NotNull
     private Coordinates coordinates;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @NotEmpty
     private List<Question> questions;
 
     private Game() {
