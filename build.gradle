@@ -1,6 +1,5 @@
 plugins {
     id "java"
-    id "application"
     id "org.springframework.boot" version "2.1.0.RELEASE"
     id "io.spring.dependency-management" version "1.0.6.RELEASE"
 }
@@ -22,5 +21,4 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     runtime("com.h2database:h2")
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile("org.assertj:assertj-core:3.11.1")
 }

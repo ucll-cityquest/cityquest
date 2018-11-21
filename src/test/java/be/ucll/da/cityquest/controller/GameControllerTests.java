@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static be.ucll.da.cityquest.model.GameBuilder.aGame;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,7 @@ public class GameControllerTests {
     }
 
     @Test
-    public void whenGettingAListOfAllGamesTheQuestionsShouldBeEmpty()  {
+    public void whenGettingAListOfAllGamesTheQuestionsShouldBeEmpty() {
         createGameAndPostIt();
         final var games = getAllGamesFromBackend();
         final var game = games.get(0);
@@ -73,6 +74,12 @@ public class GameControllerTests {
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    public void whenYouPostAGameYouShouldBeAbleToGetIt() {
+        final var game = getGameFromBackend(createGameAndPostIt().getId());
+        assertThat(game).isNotNull();
+    }
+
     private Game createGame() {
         return aGame()
                 .setName("Mechelse stadquiz")
@@ -94,8 +101,6 @@ public class GameControllerTests {
 
     private Game createGameAndPostIt() {
         final var game = createGame();
-
-
         final var entity = new HttpEntity<>(game, new HttpHeaders());
         final var response = restTemplate.exchange(
                 createURLWithPort("/games"),
@@ -104,19 +109,37 @@ public class GameControllerTests {
                 Game.class
         );
 
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
         return response.getBody();
     }
 
     private List<Game> getAllGamesFromBackend() {
         final var entity = new HttpEntity<>(null, new HttpHeaders());
-        final var games = restTemplate.exchange(
+        final var response = restTemplate.exchange(
                 createURLWithPort("/games"),
                 HttpMethod.GET,
                 entity,
                 Game[].class
-        ).getBody();
+        );
 
-        return Arrays.asList(games);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        return Arrays.asList(response.getBody());
+    }
+
+    private Game getGameFromBackend(UUID id) {
+        final var entity = new HttpEntity<>(null, new HttpHeaders());
+        final var game = restTemplate.exchange(
+                createURLWithPort("/games/" + id.toString()),
+                HttpMethod.GET,
+                entity,
+                Game.class
+        );
+
+        assertThat(game.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        return game.getBody();
     }
 
     private String createURLWithPort(String uri) {

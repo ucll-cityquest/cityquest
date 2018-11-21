@@ -35,7 +35,6 @@ public class GameController {
         return gameRepository.save(game);
     }
 
-
     @GetMapping("/games/{id}")
     public Game getGame(@PathVariable String id) {
         try {
