@@ -31,8 +31,8 @@ public class GameController {
     }
 
     @PostMapping("/games")
-    public void addGame(@Valid @RequestBody Game game) {
-        gameRepository.save(game);
+    public Game addGame(@Valid @RequestBody Game game) {
+        return gameRepository.save(game);
     }
 
 
