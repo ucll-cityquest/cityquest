@@ -63,10 +63,10 @@ public class GameControllerTests {
     public void whenGettingASpecificGameReturnA404WhenTheIdDoesNotExists() {
         final var entity = new HttpEntity<>(null, new HttpHeaders());
         final var response = restTemplate.exchange(
-                createURLWithPort("/games/thisdoesnotexist"),
+                createURLWithPort("/games/" + UUID.randomUUID().toString()),
                 HttpMethod.GET,
                 entity,
-                String.class
+                Game.class
         );
         final var statusCode = response.getStatusCode();
 

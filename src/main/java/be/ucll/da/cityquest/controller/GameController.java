@@ -35,15 +35,10 @@ public class GameController {
         return gameRepository.save(game);
     }
 
-    @GetMapping("/games/{id}")
-    public Game getGame(@PathVariable String id) {
-        try {
-            var uuid = UUID.fromString(id);
-            return gameRepository
-                    .findById(uuid)
-                    .orElseThrow(() -> new EntityNotFoundException("No game with id " + id));
-        } catch (IllegalArgumentException e) {
-            throw new EntityNotFoundException("No game with id " + id);
-        }
+    @GetMapping("/games/{uuid}")
+    public Game getGame(@PathVariable UUID uuid) {
+        return gameRepository
+                .findById(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("No game with id " + uuid));
     }
 }
