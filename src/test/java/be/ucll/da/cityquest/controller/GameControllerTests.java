@@ -41,7 +41,7 @@ public class GameControllerTests {
     }
 
     @Test
-    public void gamesShouldReturnListWithAllGames() {
+    public void whenThereAreGamesAndYouAskForAllGamesYouGetAListOfAllGames() {
         createGameAndPostIt();
         final var games = getAllGamesFromBackend();
 
