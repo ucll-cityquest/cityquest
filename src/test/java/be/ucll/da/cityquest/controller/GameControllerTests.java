@@ -1,42 +1,80 @@
 package be.ucll.da.cityquest.controller;
 
+import be.ucll.da.cityquest.Application;
 import be.ucll.da.cityquest.database.GameRepository;
 import be.ucll.da.cityquest.model.Coordinates;
+import be.ucll.da.cityquest.model.Game;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static be.ucll.da.cityquest.model.GameBuilder.aGame;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GameControllerTests {
-    @Autowired
-    private WebApplicationContext context;
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private GameRepository gameRepository;
 
-    private MockMvc mockMvc;
+    private TestRestTemplate restTemplate = new TestRestTemplate();
 
     @Before
-    public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        final var game =  aGame()
+    public void clearDatabase() {
+        gameRepository.deleteAll();
+    }
+
+    @Test
+    public void gamesShouldReturnListWithAllGames() {
+        createGameAndPostIt();
+        final var games = getAllGamesFromBackend();
+
+        assertThat(games)
+                .isNotEmpty();
+    }
+
+    @Test
+    public void whenGettingAListOfAllGamesTheQuestionsShouldBeEmpty()  {
+        createGameAndPostIt();
+        final var games = getAllGamesFromBackend();
+        final var game = games.get(0);
+
+        assertThat(game.getQuestions())
+                .isEmpty();
+    }
+
+    @Test
+    public void whenGettingASpecificGameReturnA404WhenTheIdDoesNotExists() {
+        final var entity = new HttpEntity<>(null, new HttpHeaders());
+        final var response = restTemplate.exchange(
+                createURLWithPort("/games/thisdoesnotexist"),
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+        final var statusCode = response.getStatusCode();
+
+        assertThat(statusCode)
+                .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    private Game createGame() {
+        return aGame()
                 .setName("Mechelse stadquiz")
                 .setDescription("Het coole mechelse stadquiz")
                 .setLocation("Mechelen")
@@ -52,23 +90,36 @@ public class GameControllerTests {
                                 .setExtraInfo("https://nl.wikipedia.org/wiki/Stadhuis_van_Mechelen")
                 )
                 .build();
-
-        when(gameRepository.findAll())
-            .thenReturn(List.of(game));
     }
 
-    @Test
-    public void gamesShouldReturnListWithAllGames() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/games"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$").isArray());
+    private Game createGameAndPostIt() {
+        final var game = createGame();
+
+
+        final var entity = new HttpEntity<>(game, new HttpHeaders());
+        final var response = restTemplate.exchange(
+                createURLWithPort("/games"),
+                HttpMethod.POST,
+                entity,
+                Game.class
+        );
+
+        return response.getBody();
     }
 
-    @Test
-    public void inTheGamesResponseQuestionsShouldBeEmpty() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/games"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].questions").isEmpty());
+    private List<Game> getAllGamesFromBackend() {
+        final var entity = new HttpEntity<>(null, new HttpHeaders());
+        final var games = restTemplate.exchange(
+                createURLWithPort("/games"),
+                HttpMethod.GET,
+                entity,
+                Game[].class
+        ).getBody();
+
+        return Arrays.asList(games);
+    }
+
+    private String createURLWithPort(String uri) {
+        return "http://localhost:" + port + uri;
     }
 }

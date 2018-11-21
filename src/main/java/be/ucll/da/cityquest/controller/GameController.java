@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
@@ -36,13 +35,16 @@ public class GameController {
         gameRepository.save(game);
     }
 
+
     @GetMapping("/games/{id}")
-    public Game retrieveGame(@PathVariable UUID id) {
-        Optional<Game> game = gameRepository.findById(id);
-
-        if (!game.isPresent())
-            throw new EntityNotFoundException("Game with id: " + id);
-
-        return game.get();
+    public Game getGame(@PathVariable String id) {
+        try {
+            var uuid = UUID.fromString(id);
+            return gameRepository
+                    .findById(uuid)
+                    .orElseThrow(() -> new EntityNotFoundException("No game with id " + id));
+        } catch (IllegalArgumentException e) {
+            throw new EntityNotFoundException("No game with id " + id);
+        }
     }
 }
