@@ -18,7 +18,7 @@ public class Question {
     private String question;
 
     @NotNull
-    private String extraInfo;
+    private String extraInformation;
 
     @OneToOne(cascade = CascadeType.ALL)
     @NotNull
@@ -35,12 +35,12 @@ public class Question {
     private Question() {
     }
 
-    public Question(String question, Coordinates coordinates, List<String> answers, int correctAnswer, String extraInfo) {
+    public Question(String question, Coordinates coordinates, List<String> answers, int correctAnswer, String extraInformation) {
         this.question = question;
         this.coordinates = coordinates;
         this.answers = answers;
         this.correctAnswer = correctAnswer;
-        this.extraInfo = extraInfo;
+        this.extraInformation = extraInformation;
     }
 
     public UUID getId() {
@@ -63,7 +63,7 @@ public class Question {
         return correctAnswer;
     }
 
-    public String getExtraInfo() {
-        return extraInfo;
+    public String getExtraInformation() {
+        return extraInformation;
     }
 }
