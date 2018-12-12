@@ -18,7 +18,7 @@ public class GameController {
         this.gameRepository = gameRepository;
     }
 
-    @RequestMapping("/games")
+    @GetMapping("/api/games")
     public List<Game> game() {
         return gameRepository
                 .findAll()
@@ -30,12 +30,12 @@ public class GameController {
                 .collect(toList());
     }
 
-    @PostMapping("/games")
+    @PostMapping("/api/games")
     public Game addGame(@Valid @RequestBody Game game) {
         return gameRepository.save(game);
     }
 
-    @GetMapping("/games/{uuid}")
+    @GetMapping("/api/games/{uuid}")
     public Game getGame(@PathVariable UUID uuid) {
         return gameRepository
                 .findById(uuid)
