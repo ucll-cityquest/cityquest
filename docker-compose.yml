@@ -1,6 +1,17 @@
 version: "3.0"
 services:
-  web:
-    build: .
+  consul:
+    image: consul:1.4.0
+    ports:
+      - "8500:8500"
+  game:
+    build: game
     ports:
       - "8080:8080"
+    links:
+      - "consul"
+  recommendation:
+    build: recommendation
+    links:
+      - "consul"
+

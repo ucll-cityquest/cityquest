@@ -1,12 +1,12 @@
-FROM ubuntu:18.10 as builder
+FROM ubuntu:18.04 as builder
 
 # Install gradle
-ENV GRADLE_VERSION=4.10.2
+ENV GRADLE_VERSION=4.10.3
 ENV GRADLE_HOME /home/user/gradle-$GRADLE_VERSION
 ENV PATH $GRADLE_HOME/bin:$PATH
 
 RUN apt-get update \
-    && apt-get install -y wget unzip openjdk-11-jdk-headless
+    && apt-get install -y wget unzip openjdk-8-jdk-headless
 RUN wget -P /home/user/ --quiet https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip && \
     cd /home/user/ && unzip gradle-$GRADLE_VERSION-bin.zip && rm gradle-$GRADLE_VERSION-bin.zip
 
@@ -19,8 +19,8 @@ ENV GRADLE_OPTS "$GRADLE_OPTS -Dorg.gradle.daemon=false"
 COPY . $APP_HOME
 RUN gradle bootJar
 
-FROM azul/zulu-openjdk:11
+FROM frolvlad/alpine-oraclejdk8:cleaned
 WORKDIR /usr/app/
 ARG version="0.1.0"
-COPY --from=builder /home/gradle/src/build/libs/cityquest-${version}.jar /usr/app/cityquest.jar
-CMD ["java", "-jar", "/usr/app/cityquest.jar"]
+COPY --from=builder /home/gradle/src/build/libs/recommendation-${version}.jar /usr/app/recommendation.jar
+CMD ["java", "-jar", "/usr/app/recommendation.jar"]
