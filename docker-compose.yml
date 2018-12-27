@@ -10,15 +10,7 @@ services:
       - "8080:8080"
     links:
       - "consul"
-    volumes:
-      - "database-data:/usr/share/cityquest"
   recommendation:
     build: recommendation
     links:
       - "consul"
-    volumes:
-      - "database-data:/usr/share/cityquest"
-
-volumes:
-  database-data:
-
