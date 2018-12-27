@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//@EnableDiscoveryClient
 @SpringBootApplication
 public class Application {
 
