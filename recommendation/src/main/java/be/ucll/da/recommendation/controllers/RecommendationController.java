@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 
@@ -27,9 +28,9 @@ public class RecommendationController {
         return repository.save(recommendedItem);
     }
 
-    @RequestMapping("/recommend/{emailAddress}")
-    public Map<Item, Float> getRecommendedItems(@PathVariable String emailAddress) {
-        List<RecommendedItem> recommendedItemsByEmailAddress = repository.findAllByEmailAddress(emailAddress);
+    @RequestMapping("/recommend/{uuid}")
+    public Map<Item, Float> getRecommendedItems(@PathVariable UUID userId) {
+        List<RecommendedItem> recommendedItemsByEmailAddress = repository.findAllByUserId(userId);
 
         if (recommendedItemsByEmailAddress.isEmpty()) {
             return null;
@@ -60,7 +61,7 @@ public class RecommendationController {
     }
 
     private void addRecommendedItemToAllSavedPreferences(Map<User, Map<Item, Float>> allSavedPreferences, RecommendedItem item) {
-        User user = new User(item.getEmailAddress());
+        User user = new User(item.getUserId());
         if (!allSavedPreferences.containsKey(user)) {
             allSavedPreferences.put(user, new HashMap<>());
         }

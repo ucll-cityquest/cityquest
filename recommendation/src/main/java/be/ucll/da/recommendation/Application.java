@@ -20,9 +20,9 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    private static UUID romeinen = UUID.fromString("b4357989-e3b1-42f8-a325-c2591e5c6ad8");
-    private static UUID toverdrank = UUID.fromString("b4357989-e3b1-42f8-a325-c2591e5c6ad9");
-    private static UUID everzwijnen = UUID.fromString("b4357989-e3b1-42f8-a325-c2591e5c6ad7");
+    private static final UUID ROMEINEN = UUID.fromString("b4357989-e3b1-42f8-a325-c2591e5c6ad8");
+    private static final UUID TOVERDRANK = UUID.fromString("b4357989-e3b1-42f8-a325-c2591e5c6ad9");
+    private static final UUID EVERZWIJNEN = UUID.fromString("b4357989-e3b1-42f8-a325-c2591e5c6ad7");
 
     @Bean
     public CommandLineRunner demo(RecommendedItemRepository repository) {
@@ -30,25 +30,25 @@ public class Application {
             HashMap<User, Map<Item, Float>> userMap = new HashMap<>();
 
             HashMap<Item, Float> asterixPreferences = new HashMap<>();
-            asterixPreferences.put(new Item(toverdrank), 4.8f);
-            asterixPreferences.put(new Item(romeinen), 1.2f);
-            asterixPreferences.put(new Item(everzwijnen), 4.6f);
+            asterixPreferences.put(new Item(TOVERDRANK), 4.8f);
+            asterixPreferences.put(new Item(ROMEINEN), 1.2f);
+            asterixPreferences.put(new Item(EVERZWIJNEN), 4.6f);
             userMap.put(new User("asterix@ucll.be"), asterixPreferences);
 
             HashMap<Item, Float> obelixPreferences = new HashMap<>();
-            obelixPreferences.put(new Item(toverdrank), 4.4f);
-            obelixPreferences.put(new Item(romeinen), 3.2f);
-            obelixPreferences.put(new Item(everzwijnen), 5f);
+            obelixPreferences.put(new Item(TOVERDRANK), 4.4f);
+            obelixPreferences.put(new Item(ROMEINEN), 3.2f);
+            obelixPreferences.put(new Item(EVERZWIJNEN), 5f);
             userMap.put(new User("obelix@ucll.be"), obelixPreferences);
 
             HashMap<Item, Float> panoramixPreferences = new HashMap<>();
-            panoramixPreferences.put(new Item(toverdrank), 4.2f);
-            panoramixPreferences.put(new Item(romeinen), 2.2f);
-            panoramixPreferences.put(new Item(everzwijnen), 4.1f);
+            panoramixPreferences.put(new Item(TOVERDRANK), 4.2f);
+            panoramixPreferences.put(new Item(ROMEINEN), 2.2f);
+            panoramixPreferences.put(new Item(EVERZWIJNEN), 4.1f);
             userMap.put(new User("idefix@ucll.be"), panoramixPreferences);
 
             HashMap<Item, Float> ronaldPreferences = new HashMap<>();
-            ronaldPreferences.put(new Item(toverdrank), 4.9f);
+            ronaldPreferences.put(new Item(TOVERDRANK), 4.9f);
             userMap.put(new User("ronald.dehuysser@ucll.be"), ronaldPreferences);
 
             saveUserMapToRepository(repository, userMap);
@@ -75,8 +75,8 @@ public class Application {
 
     private RecommendedItem itemToRecommendedItem(User user, Item item, float rating) {
         RecommendedItem aRecommendedItem = new RecommendedItem();
-        aRecommendedItem.setEmailAddress(user.toString());
-        aRecommendedItem.setRatedItem(UUID.fromString(item.toString()));
+        aRecommendedItem.setId(user.getId());
+        aRecommendedItem.setRatedItem(item.getId());
         aRecommendedItem.setRating(rating);
         return aRecommendedItem;
     }

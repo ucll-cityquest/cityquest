@@ -1,62 +1,68 @@
 package be.ucll.da.recommendation.model;
 
-
 import org.junit.Test;
-
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import static java.util.Map.entry;
 
 public class SlopeOneTest {
+    private final static UUID ROMEINEN = UUID.randomUUID();
+    private final static UUID TOVERDRANK = UUID.randomUUID();
+    private final static UUID EVERZWIJNEN = UUID.randomUUID();
+    private final static UUID ASTERIX = UUID.randomUUID();
+    private final static UUID OBELIX = UUID.randomUUID();
+    private final static UUID PANORAMIX = UUID.randomUUID();
 
     @Test
     public void doesSlopeOneDoWhatIExpectItToDo() {
-        HashMap<User, Map<Item, Float>> userPreferences = createUserPreferencesMap();
+        var userPreferences = createUserPreferencesMap();
 
+        var slopeOne = new SlopeOne(userPreferences);
 
-        SlopeOne slopeOne = new SlopeOne(userPreferences);
+        var kakoPhonixPreferences = new HashMap<Item, Float>();
+        kakoPhonixPreferences.put(new Item(TOVERDRANK), 4.5f);
 
-        HashMap<Item, Float> kakoPhonixPreferences = new HashMap<>();
-        kakoPhonixPreferences.put(new Item("Toverdrank"), 4.5f);
-
-        Map<Item, Float> predict = slopeOne.predict(kakoPhonixPreferences);
+        var predict = slopeOne.predict(kakoPhonixPreferences);
         System.out.println(predict);
     }
 
     @Test
     public void newUserDidNotRecommendAnything() {
-        HashMap<User, Map<Item, Float>> userPreferences = createUserPreferencesMap();
+        var userPreferences = createUserPreferencesMap();
 
+        var slopeOne = new SlopeOne(userPreferences);
 
-        SlopeOne slopeOne = new SlopeOne(userPreferences);
-
-        HashMap<Item, Float> kakoPhonixPreferences = new HashMap<>();
-        kakoPhonixPreferences.put(new Item("Toverdrank"), 4.1f);
-        Map<Item, Float> predict = slopeOne.predict(kakoPhonixPreferences);
+        var kakoPhonixPreferences = new HashMap<Item, Float>();
+        kakoPhonixPreferences.put(new Item(TOVERDRANK), 4.1f);
+        var predict = slopeOne.predict(kakoPhonixPreferences);
         System.out.println(predict);
     }
 
-    private HashMap<User, Map<Item, Float>> createUserPreferencesMap() {
-        HashMap<User, Map<Item, Float>> userMap = new HashMap<>();
+    private Map<User, Map<Item, Float>> createUserPreferencesMap() {
+        var userMap = new HashMap<User, Map<Item, Float>>();
 
-        HashMap<Item, Float> asterixPreferences = new HashMap<>();
-        asterixPreferences.put(new Item("Toverdrank"), 4.8f);
-        asterixPreferences.put(new Item("Romeinen"), 1.2f);
-        asterixPreferences.put(new Item("Everzwijnen"), 4.6f);
-        userMap.put(new User("Asterix"), asterixPreferences);
+        var asterixPreferences = createPreferences(4.8f, 1.2f, 4.6f);
+        userMap.put(new User(ASTERIX), asterixPreferences);
 
-        HashMap<Item, Float> obelixPreferences = new HashMap<>();
-        obelixPreferences.put(new Item("Toverdrank"), 4.4f);
-        obelixPreferences.put(new Item("Romeinen"), 3.2f);
-        obelixPreferences.put(new Item("Everzwijnen"), 5f);
-        userMap.put(new User("Obelix"), obelixPreferences);
+        var obelixPreferences = createPreferences(4.4f, 3.2f, 5f);
+        userMap.put(new User(OBELIX), obelixPreferences);
 
-        HashMap<Item, Float> panoramixPreferences = new HashMap<>();
-        panoramixPreferences.put(new Item("Toverdrank"), 4.2f);
-        panoramixPreferences.put(new Item("Romeinen"), 2.2f);
-        panoramixPreferences.put(new Item("Everzwijnen"), 4.1f);
-        userMap.put(new User("Panoramix"), panoramixPreferences);
+        var panoramixPreferences = createPreferences(4.2f, 2.2f, 4.1f);
+        userMap.put(new User(PANORAMIX), panoramixPreferences);
 
         return userMap;
     }
+
+
+    private Map<Item, Float> createPreferences(float toverdrank, float romeinen, float everzwijnen) {
+        return Map.ofEntries(
+                entry(new Item(TOVERDRANK), toverdrank),
+                entry(new Item(ROMEINEN), romeinen),
+                entry(new Item(EVERZWIJNEN), everzwijnen)
+        );
+    }
+
 }

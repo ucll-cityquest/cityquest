@@ -1,22 +1,38 @@
 package be.ucll.da.recommendation.model;
 
+import java.util.Objects;
+import java.util.UUID;
+
 public class User {
-    String content;
+    private UUID id;
+
+    public User(UUID id) {
+        this.id = id;
+    }
 
     public User(String s) {
-        content = s;
+        id = UUID.fromString(s);
     }
 
-    public int hashCode() {
-        return content.hashCode();
-    }
-
-    public String toString() {
-        return content;
+    public UUID getId() {
+        return id;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return this.content.equals(((User) obj).content);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("User{id=%s}", id);
     }
 }
