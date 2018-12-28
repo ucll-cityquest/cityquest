@@ -8,9 +8,8 @@ import java.util.UUID;
 
 @Entity
 public class RecommendedItem {
-
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String emailAddress;
     private UUID ratedItem;

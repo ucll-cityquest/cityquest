@@ -1,10 +1,8 @@
 package be.ucll.da.recommendation.model;
 
 
-import be.ucll.da.recommendation.model.Item;
-import be.ucll.da.recommendation.model.SlopeOne;
-import be.ucll.da.recommendation.model.User;
 import org.junit.Test;
+
 
 import java.util.HashMap;
 import java.util.Map;

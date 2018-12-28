@@ -30,14 +30,14 @@ public class RecommendationController {
     public Map<Item, Float> getRecommendedItems(@PathVariable String emailAddress) {
         List<RecommendedItem> recommendedItemsByEmailAddress = repository.findAllByEmailAddress(emailAddress);
 
-        if(recommendedItemsByEmailAddress.isEmpty()) {
+        if (recommendedItemsByEmailAddress.isEmpty()) {
             return null;
         }
 
         SlopeOne slopeOnePredictionMachine = getSlopeOnePredictionMachine();
-        Map<Item, Float> userPrefences = mapToSlopeOneInput(recommendedItemsByEmailAddress);
+        Map<Item, Float> userPreferences = mapToSlopeOneInput(recommendedItemsByEmailAddress);
 
-        return slopeOnePredictionMachine.predict(userPrefences);
+        return slopeOnePredictionMachine.predict(userPreferences);
     }
 
     private Map<Item, Float> mapToSlopeOneInput(List<RecommendedItem> recommendedItemsByEmailAddress) {
@@ -60,7 +60,7 @@ public class RecommendationController {
 
     private void addRecommendedItemToAllSavedPreferences(Map<User, Map<Item, Float>> allSavedPreferences, RecommendedItem item) {
         User user = new User(item.getEmailAddress());
-        if(!allSavedPreferences.containsKey(user)) {
+        if (!allSavedPreferences.containsKey(user)) {
             allSavedPreferences.put(user, new HashMap<>());
         }
 
