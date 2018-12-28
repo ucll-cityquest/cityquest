@@ -5,12 +5,12 @@ services:
     ports:
       - "8500:8500"
   game:
-    build: game
+    image: game:latest
     ports:
       - "8080:8080"
     links:
       - "consul"
   recommendation:
-    build: recommendation
+    image: recommendation:latest
     links:
       - "consul"

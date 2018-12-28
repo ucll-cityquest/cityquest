@@ -2,6 +2,13 @@ plugins {
     id "java"
     id "org.springframework.boot" version "2.1.0.RELEASE"
     id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id 'com.google.cloud.tools.jib' version '0.10.1'
+}
+
+jib {
+    from {
+        image = "openjdk:11-jre-slim"
+    }
 }
 
 bootJar {
@@ -23,6 +30,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.cloud:spring-cloud-starter-consul-discovery:2.1.0.RC2")
+    compile project(":shared")
     runtime("com.h2database:h2")
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

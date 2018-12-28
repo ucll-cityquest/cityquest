@@ -1,3 +1,4 @@
 rootProject.name = 'cityquest'
+include 'shared'
 include 'game'
 include 'recommendation'

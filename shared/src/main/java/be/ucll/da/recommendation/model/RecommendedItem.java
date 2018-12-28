@@ -1,4 +1,4 @@
-package be.ucll.da.recommendation.controllers;
+package be.ucll.da.recommendation.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

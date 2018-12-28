@@ -1,6 +1,6 @@
 package be.ucll.da.recommendation.repository;
 
-import be.ucll.da.recommendation.controllers.RecommendedItem;
+import be.ucll.da.recommendation.model.RecommendedItem;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

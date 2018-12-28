@@ -1,7 +1,7 @@
 package be.ucll.da.recommendation;
 
-import be.ucll.da.recommendation.controllers.RecommendedItem;
 import be.ucll.da.recommendation.model.Item;
+import be.ucll.da.recommendation.model.RecommendedItem;
 import be.ucll.da.recommendation.model.User;
 import be.ucll.da.recommendation.repository.RecommendedItemRepository;
 import org.springframework.boot.CommandLineRunner;
