@@ -28,8 +28,8 @@ public class RecommendationController {
         return repository.save(recommendedItem);
     }
 
-    @RequestMapping("/recommend/{uuid}")
-    public Map<Item, Float> getRecommendedItems(@PathVariable UUID userId) {
+    @RequestMapping("/recommend/{userId}")
+    public Map<UUID, Float> getRecommendedItems(@PathVariable UUID userId) {
         List<RecommendedItem> recommendedItemsByEmailAddress = repository.findAllByUserId(userId);
 
         if (recommendedItemsByEmailAddress.isEmpty()) {
@@ -39,7 +39,10 @@ public class RecommendationController {
         SlopeOne slopeOnePredictionMachine = getSlopeOnePredictionMachine();
         Map<Item, Float> userPreferences = mapToSlopeOneInput(recommendedItemsByEmailAddress);
 
-        return slopeOnePredictionMachine.predict(userPreferences);
+        final var result = new HashMap<UUID, Float>();
+        slopeOnePredictionMachine.predict(userPreferences)
+                .forEach((item, rating) -> result.put(item.getId(), rating));
+        return result;
     }
 
     private Map<Item, Float> mapToSlopeOneInput(List<RecommendedItem> recommendedItemsByEmailAddress) {
