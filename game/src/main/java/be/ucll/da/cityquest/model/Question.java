@@ -18,6 +18,7 @@ public class Question {
     private String question;
 
     @NotNull
+    @Lob
     private String extraInformation;
 
     @OneToOne(cascade = CascadeType.ALL)

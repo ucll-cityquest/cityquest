@@ -10,10 +10,6 @@ public class User {
         this.id = id;
     }
 
-    public User(String s) {
-        id = UUID.fromString(s);
-    }
-
     public UUID getId() {
         return id;
     }
