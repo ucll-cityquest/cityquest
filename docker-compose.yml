@@ -4,13 +4,35 @@ services:
     image: consul:1.4.0
     ports:
       - "8500:8500"
+
+  frontend:
+    build: "front-end"
+    labels:
+      traefik.port: 80
+      traefik.frontend.rule: "PathPrefix:/"
+
   game:
     image: game:latest
-    ports:
-      - "8080:8080"
     links:
       - "consul"
+    labels:
+      traefik.port: 8080
+      traefik.frontend.rule: "PathPrefix:/api/"
+
   recommendation:
     image: recommendation:latest
     links:
       - "consul"
+
+  reverse-proxy:
+    image: traefik:1.5
+    depends_on:
+      - consul
+    command:
+      - "--api"
+      - "--docker"
+    ports:
+      - "8080:80" # http port (running on port 8080)
+      - "81:8080" # web ui (running on port 81)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
