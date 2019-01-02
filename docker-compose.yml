@@ -24,15 +24,14 @@ services:
     links:
       - "consul"
 
-  reverse-proxy:
-    image: traefik:1.7.6-alpine
-    depends_on:
-      - consul
-    command:
-      - "--api"
-      - "--docker"
+  reverse_proxy:
+    image: traefik:1.7.6
     ports:
-      - "8080:80" # http port (running on port 8080)
+      - "8080:443" # https port (running on port 8080)
       - "81:8080" # web ui (running on port 81)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      # ITS IMPORTANT THAT THESE ARE TWO SEPRATE VOLUMES (see https://github.com/containous/traefik/issues/2001)
+      - /etc/letsencrypt/live/cityquest.robinvdb.me/cert.pem:/certs/cert.pem
+      - /etc/letsencrypt/live/cityquest.robinvdb.me/privkey.pem:/certs/privkey.pem
+      - ./traefik.toml:/traefik.toml
