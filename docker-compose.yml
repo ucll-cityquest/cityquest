@@ -17,7 +17,7 @@ services:
       - "consul"
     labels:
       traefik.port: 8080
-      traefik.frontend.rule: "PathPrefix:/api/"
+      traefik.frontend.rule: "PathPrefixStrip:/api/"
 
   recommendation:
     image: recommendation:latest

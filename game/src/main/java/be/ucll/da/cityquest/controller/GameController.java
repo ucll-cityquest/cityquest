@@ -28,7 +28,7 @@ public class GameController {
         this.recommendationService = recommendationService;
     }
 
-    @GetMapping("/api/games")
+    @GetMapping("/games")
     public List<Game> game() {
         return gameRepository
                 .findAll()
@@ -40,19 +40,19 @@ public class GameController {
                 .collect(toList());
     }
 
-    @PostMapping("/api/games")
+    @PostMapping("/games")
     public Game addGame(@Valid @RequestBody Game game) {
         return gameRepository.save(game);
     }
 
-    @GetMapping("/api/games/{uuid}")
+    @GetMapping("/games/{uuid}")
     public Game getGame(@PathVariable UUID uuid) {
         return gameRepository
                 .findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("No game with id " + uuid));
     }
 
-    @GetMapping("/api/games/recommended/{userId}")
+    @GetMapping("/games/recommended/{userId}")
     public GamePreferences getRecommended(@PathVariable UUID userId) {
         try {
             return recommendationService.getRecomendations(userId);
@@ -61,7 +61,7 @@ public class GameController {
         }
     }
 
-    @PostMapping("/api/games/{gameId}/rate")
+    @PostMapping("/games/{gameId}/rate")
     public ResponseEntity<RecommendedItem> rateGame(@PathVariable UUID gameId, @Valid @RequestBody RatingDto rating) {
         if (!gameId.equals(rating.getGameId())) {
             return ResponseEntity.unprocessableEntity().build();
