@@ -26,6 +26,9 @@ services:
 
   reverse_proxy:
     image: traefik:1.7.6
+    command:
+      - "--api"
+      - "--docker"
     ports:
       - "8080:443" # https port (running on port 8080)
       - "81:8080" # web ui (running on port 81)

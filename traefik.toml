@@ -1,25 +1,13 @@
 debug = true
 
 logLevel = "DEBUG"
-defaultEntryPoints = ["https","http"]
+defaultEntryPoints = ["https"]
 
 # The syntax is somewhat esoteric so this is mostly copy-paste
 [entryPoints]
-    [entryPoints.http]
-    address = ":80"
-    [entryPoints.http.redirect]
-    entryPoint = "https"
     [entryPoints.https]
         address = ":443"
         [entryPoints.https.tls]
             [[entryPoints.https.tls.certificates]]
                 certFile = "/certs/cert.pem"
                 keyFile = "/certs/privkey.pem"
-
-[api]
-
-[docker]
-endpoint = "unix:///var/run/docker.sock"
-domain = "robinvdb.me"
-watch = true
-exposedbydefault = false
