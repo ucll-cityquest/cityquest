@@ -478,7 +478,7 @@ class Play extends React.Component {
         <h2>Thank you for playing this game.</h2>
         <h3>Please rate it!</h3>
 
-        <div className={"score-container"}>
+        <div className="score-container">
           {range(1, 5).map(i => (
             <span onClick={() => this.rateGame(i)} className="score-item">
               {i}
