@@ -2,18 +2,18 @@
  * Create a stream with the current location.
  *
  * @param {function} succesCb format: ([latitude, longitude] => any)
- * @param {function} errorCb format: (error => any)
- * @param {number} intervalTime how many miliseconds to wait between each update
- *
- *  @returns close function
+ * @param {function} errorCb format: (error => any), only called when there is an error when watching
+ *                                   not when creating.
+ * @throws {Error} When geolocation is not supported
+ * @returns close function
  */
 export function createLocationStream(
   successCb,
+  // eslint-disable-next-line no-console
   errorCb = err => console.error(err)
 ) {
   if (navigator.geolocation === undefined) {
-    errorCb("Browser does not support geolocation");
-    return;
+    throw new Error("Browser does not support geolocation");
   }
 
   const options = {
@@ -22,11 +22,12 @@ export function createLocationStream(
     maximumAge: 0
   };
 
-  let id = navigator.geolocation.watchPosition(
+  const id = navigator.geolocation.watchPosition(
     position =>
       successCb([position.coords.latitude, position.coords.longitude]),
     errorCb,
     options
   );
+
   return () => navigator.geolocation.clearWatch(id);
 }

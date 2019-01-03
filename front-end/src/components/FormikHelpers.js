@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 export const DisplayFormikState = props => (
   <div style={{ margin: "1rem 0" }}>
+    <strong>Props: </strong>
     <pre
       style={{
         background: "#f6f8fa",
@@ -10,7 +11,7 @@ export const DisplayFormikState = props => (
         padding: ".5rem"
       }}
     >
-      <strong>props</strong> = {JSON.stringify(props, null, 2)}
+      {JSON.stringify(props, null, 2)}
     </pre>
   </div>
 );
@@ -23,7 +24,6 @@ export const RadioButtonGroup = ({
   value,
   error,
   touched,
-  id,
   label,
   className,
   children
@@ -48,13 +48,13 @@ export const RadioButtonGroup = ({
   );
 };
 
-export const RadioButton = ({
-  field: { name, value, onChange, onBlur },
-  id,
-  label,
-  className,
-  ...props
-}) => {
+export const RadioButton = props => {
+  const {
+    field: { name, value, onChange, onBlur },
+    id,
+    label
+  } = props;
+
   return (
     <div>
       <input

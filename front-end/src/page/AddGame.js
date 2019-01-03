@@ -55,7 +55,7 @@ const schema = Yup.object().shape({
     )
 });
 
-const styles = theme => ({
+const styles = () => ({
   container: {
     flexWrap: "wrap"
   },
@@ -148,7 +148,7 @@ const AddGame = ({ classes, history }) => {
       }))
     });
 
-    let result = await fetch(createApiUrl("games"), {
+    const result = await fetch(createApiUrl("games"), {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -283,7 +283,7 @@ const AddGame = ({ classes, history }) => {
                                   newAnswer: ""
                                 });
                               }}
-                              //onClick={handleSubmit}
+                              // onClick={handleSubmit}
                               disabled={question.newAnswer.trim() === ""}
                             >
                               Add answer

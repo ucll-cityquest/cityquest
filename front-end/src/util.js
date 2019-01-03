@@ -1,15 +1,13 @@
 import uuid from "uuid/v1";
 
-export const getUserId = () => {
-  return localStorage.getItem("userId");
-};
+export const getUserId = () => localStorage.getItem("userId");
 
 export const setUserId = id => {
   localStorage.setItem("userId", id);
 };
 
 export const initUserId = () => {
-  let id = getUserId();
+  const id = getUserId();
   if (!id) {
     setUserId(uuid());
   }

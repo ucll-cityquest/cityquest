@@ -9,19 +9,10 @@ import Game from "../components/Game";
 import { getUserId } from "../util";
 
 class Overview extends Component {
-  state = {
-    fetching: false,
-    games: []
-  };
-
-  componentDidMount() {
-    this.fetchGames();
-  }
-
-  sortGames(games, ratings) {
-    let nums = Object.keys(ratings).map(key => ratings[key]);
+  static sortGames(games, ratings) {
+    const nums = Object.keys(ratings).map(key => ratings[key]);
     nums.sort((a, b) => b - a);
-    let result = [];
+    const result = [];
     let prevnum = -1;
     nums.forEach(num => {
       if (num === prevnum) return;
@@ -37,20 +28,34 @@ class Overview extends Component {
     return result;
   }
 
+  state = {
+    loading: false,
+    games: []
+  };
+
+  componentDidMount() {
+    this.fetchGames();
+  }
+
   async fetchGames() {
-    this.setState({ fetching: true });
+    this.setState({ loading: true });
     try {
       const result = await fetch(createApiUrl("games"));
       const result2 = await fetch(
-        createApiUrl("games/recommended/" + getUserId())
+        createApiUrl(`games/recommended/${getUserId()}`)
       );
       let json = await result.json();
       try {
-        let json2 = await result2.json();
+        const json2 = await result2.json();
         json = this.sortGames(json, json2);
-      } catch (error) {}
+      } catch (error) {
+        this.setState({
+          loading: false,
+          error
+        });
+      }
       this.setState({
-        fetching: false,
+        loading: false,
         games: json
       });
     } catch (e) {
@@ -68,7 +73,12 @@ class Overview extends Component {
       return <div>Loading</div>;
     }
     if (error) {
-      return <div>Error: {this.state.error.toString()}</div>;
+      return (
+        <div>
+          Error:
+          {error.toString()}
+        </div>
+      );
     }
 
     return (

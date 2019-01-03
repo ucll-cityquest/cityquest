@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import Modal from "react-responsive-modal";
 import classNames from "classnames";
 import { Map, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import { Redirect } from "react-router";
 import { createApiUrl } from "../api";
 import { createLocationStream } from "../geolocation";
 import { getUserId, range } from "../util";
-import { Redirect } from "react-router";
 
 const radius = 50;
 
@@ -72,8 +72,8 @@ class Play extends React.Component {
 
   startGeoLocation() {
     this.close = createLocationStream(location => {
-      let otherProps = {};
-      let startingProps = {};
+      const otherProps = {};
+      const startingProps = {};
 
       if (this.state.loadingStartLocation) {
         startingProps.loadingStartLocation = false;
@@ -103,26 +103,29 @@ class Play extends React.Component {
     const isQuestionInRadius = el => {
       function getDistance(origin, destination) {
         // return distance in meters
-        var lon1 = toRadian(origin[1]),
-          lat1 = toRadian(origin[0]),
-          lon2 = toRadian(destination[1]),
-          lat2 = toRadian(destination[0]);
+        const lon1 = toRadian(origin[1]);
 
-        var deltaLat = lat2 - lat1;
-        var deltaLon = lon2 - lon1;
+        const lat1 = toRadian(origin[0]);
 
-        var a =
+        const lon2 = toRadian(destination[1]);
+
+        const lat2 = toRadian(destination[0]);
+
+        const deltaLat = lat2 - lat1;
+        const deltaLon = lon2 - lon1;
+
+        const a =
           Math.pow(Math.sin(deltaLat / 2), 2) +
           Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
-        var c = 2 * Math.asin(Math.sqrt(a));
-        var EARTH_RADIUS = 6371;
+        const c = 2 * Math.asin(Math.sqrt(a));
+        const EARTH_RADIUS = 6371;
         return c * EARTH_RADIUS * 1000;
       }
       function toRadian(degree) {
         return (degree * Math.PI) / 180;
       }
 
-      let diff = getDistance(this.state.location, [
+      const diff = getDistance(this.state.location, [
         el.coordinates.lat,
         el.coordinates.lng
       ]);
@@ -142,7 +145,7 @@ class Play extends React.Component {
       // SETTING NEW ACTIVE QUESTION IF NECESSARY
       if (!activeQuestion && activeQuestionsQueue.length > 0) {
         for (let i = 0; i < activeQuestionsQueue.length; i++) {
-          let item = activeQuestionsQueue[i];
+          const item = activeQuestionsQueue[i];
           if (item.selectedAnswer === undefined || item.selectedAnswer === -1) {
             item.selectedAnswer = -1;
             this.setState(
@@ -164,8 +167,8 @@ class Play extends React.Component {
     };
 
     this.state.game.questions.forEach(el => {
-      let res1 = this.isQuestionInArray(el, activeQuestionsQueue);
-      let res2 = this.isQuestionInArray(el, ignoredQuestions);
+      const res1 = this.isQuestionInArray(el, activeQuestionsQueue);
+      const res2 = this.isQuestionInArray(el, ignoredQuestions);
 
       if (!isQuestionInRadius(el)) {
         // REMOVING ITEM FROM ACTIVE QUESTIONS QUEUE
@@ -244,7 +247,7 @@ class Play extends React.Component {
         <h1>{game.name}</h1>
         <h4>{game.description}</h4>
         <h4>
-          {game.location} ({game.coordinates.lat}, {game.coordinates.lng})
+          {game.location} ({game.coordinates.lat},{game.coordinates.lng})
         </h4>
         <p>
           Your current location is: ({this.state.location[0]},{" "}
@@ -326,7 +329,10 @@ class Play extends React.Component {
             <React.Fragment key={el.id}>
               <Marker position={[el.coordinates.lat, el.coordinates.lng]}>
                 <Popup>
-                  <span>Question: {el.question}</span>
+                  <span>
+                    Question:
+                    {el.question}
+                  </span>
                 </Popup>
               </Marker>
               <Circle
@@ -334,7 +340,10 @@ class Play extends React.Component {
                 radius={radius}
               >
                 <Popup>
-                  <span>Radius for question: {el.question}</span>
+                  <span>
+                    Radius for question:
+                    {el.question}
+                  </span>
                 </Popup>
               </Circle>
             </React.Fragment>
@@ -385,7 +394,7 @@ class Play extends React.Component {
   }
 
   submitAnswer() {
-    let questions = [];
+    const questions = [];
     this.state.game.questions.forEach(el => {
       if (el.id === this.state.activeQuestion.id) {
         el.selectedAnswer = this.state.activeQuestion.selectedAnswer;
@@ -399,7 +408,7 @@ class Play extends React.Component {
   }
 
   renderActiveQuestion() {
-    let {
+    const {
       question,
       answers,
       selectedAnswer,
@@ -454,7 +463,7 @@ class Play extends React.Component {
   }
 
   async rateGame(rating) {
-    await fetch(createApiUrl("games/" + this.state.game.id + "/rate"), {
+    await fetch(createApiUrl(`games/${this.state.game.id}/rate`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
