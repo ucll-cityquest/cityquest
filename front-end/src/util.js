@@ -26,3 +26,16 @@ export function findIndexOr(array, predicate, defaultValue = -1) {
   if (value === -1) return defaultValue;
   return value;
 }
+
+export function range(min, max, step = 1) {
+  if (step === 0) {
+    throw new Error("Step cannot be 0");
+  }
+
+  const array = [];
+  for (let i = min; i <= max; i += step) {
+    array.push(i);
+  }
+
+  return array;
+}

@@ -4,7 +4,7 @@ import { createApiUrl } from "../api";
 import Modal from "react-responsive-modal";
 import { Map, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import { createLocationStream } from "../geolocation";
-import { getUserId } from "../util";
+import { getUserId, range } from "../util";
 import { Redirect } from "react-router";
 const radius = 50;
 
@@ -472,22 +472,13 @@ class Play extends React.Component {
       >
         <h2>Thank you for playing this game.</h2>
         <h3>Please rate it!</h3>
+
         <div className={"score-container"}>
-          <span onClick={() => this.rateGame(1)} className={"score-item"}>
-            1
-          </span>
-          <span onClick={() => this.rateGame(2)} className={"score-item"}>
-            2
-          </span>
-          <span onClick={() => this.rateGame(3)} className={"score-item"}>
-            3
-          </span>
-          <span onClick={() => this.rateGame(4)} className={"score-item"}>
-            4
-          </span>
-          <span onClick={() => this.rateGame(5)} className={"score-item"}>
-            5
-          </span>
+          {range(1, 5).map(i => (
+            <span onClick={() => this.rateGame(i)} className="score-item">
+              {i}
+            </span>
+          ))}
         </div>
       </Modal>
     );
