@@ -440,7 +440,10 @@ class Play extends React.Component {
   }
 
   checkEnd() {
-    const { questions } = this.state;
+    const {
+      game: { questions }
+    } = this.state;
+
     const end = questions.every(
       el => el.selectedAnswer !== undefined && el.selectedAnswer !== -1
     );
