@@ -39,25 +39,27 @@ class Overview extends Component {
 
   async fetchGames() {
     this.setState({ loading: true });
+
     try {
-      const result = await fetch(createApiUrl("games"));
-      const result2 = await fetch(
-        createApiUrl(`games/recommended/${getUserId()}`)
-      );
-      let json = await result.json();
+      const allGamesResponse = await fetch(createApiUrl("games"));
+      const allGames = await allGamesResponse.json();
+
       try {
-        const json2 = await result2.json();
-        json = this.sortGames(json, json2);
-      } catch (error) {
+        const recommendationRequest = await fetch(
+          createApiUrl(`games/recommended/${getUserId()}`)
+        );
+        const recommended = await recommendationRequest.json();
         this.setState({
           loading: false,
-          error
+          games: this.sortGames(allGames, recommended)
+        });
+      } catch (error) {
+        // Problem with recomendation
+        this.setState({
+          loading: false,
+          games: allGames
         });
       }
-      this.setState({
-        loading: false,
-        games: json
-      });
     } catch (e) {
       this.setState({
         loading: false,
