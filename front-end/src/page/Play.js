@@ -1,11 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { createApiUrl } from "../api";
 import Modal from "react-responsive-modal";
+import classNames from "classnames";
 import { Map, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import { createApiUrl } from "../api";
 import { createLocationStream } from "../geolocation";
 import { getUserId, range } from "../util";
 import { Redirect } from "react-router";
+
 const radius = 50;
 
 class Play extends React.Component {
@@ -309,8 +311,8 @@ class Play extends React.Component {
         style={{ width: 800, height: 400 }}
       >
         <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
         />
         <Marker position={this.state.location}>
           <Popup>
@@ -412,18 +414,21 @@ class Play extends React.Component {
           center
         >
           <h2>{question}</h2>
-          {answers.map((el, i) => (
-            <div style={{ display: "flex" }}>
-              <span
-                onClick={() => this.selectAnswer(i)}
-                className={
-                  selectedAnswer === i ? "answer selectedAnswer" : "answer"
-                }
-              >
-                {el}
-              </span>
-            </div>
-          ))}
+          {answers.map((el, i) => {
+            const isSelected = selectedAnswer === i;
+            const classes = classNames("answer", {
+              selectedAnswer: isSelected
+            });
+
+            return (
+              <div style={{ display: "flex" }}>
+                <span onClick={() => this.selectAnswer(i)} className={classes}>
+                  {el}
+                </span>
+              </div>
+            );
+          })}
+
           <button style={{ marginTop: 20 }} onClick={() => this.submitAnswer()}>
             Submit
           </button>
