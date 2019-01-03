@@ -4,16 +4,15 @@ import Modal from "react-responsive-modal";
 import classNames from "classnames";
 import { Map, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import { Redirect } from "react-router";
+import { EndModal } from "../components/EndModal";
 import { createApiUrl } from "../api";
 import { createLocationStream } from "../geolocation";
-import { getUserId, range } from "../util";
-
-const radius = 50;
+import { getUserId, toRadian } from "../util";
 
 class Play extends React.Component {
-  static proptypes = {
+  static propTypes = {
     match: PropTypes.shape({
-      parms: PropTypes.shape({
+      params: PropTypes.shape({
         id: PropTypes.string.isRequired
       }).isRequired
     }).isRequired
@@ -39,7 +38,8 @@ class Play extends React.Component {
     dev: {
       modN: 0,
       modE: 0
-    }
+    },
+    radius: 50
   };
 
   async componentDidMount() {
@@ -48,58 +48,281 @@ class Play extends React.Component {
     this.loadGame();
   }
 
-  async loadGame() {
-    try {
-      const download = await fetch(
-        createApiUrl(`games/${this.props.match.params.id}`)
-      );
-      if (!download.ok) {
-        this.setState({ game: null, error: "Game could not be found." });
-        return;
-      }
-      const result = await download.json();
-      this.setState({
-        game: result
-      });
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({
-        loading: false
-      });
-    }
+  componentWillUnmount() {
+    this.close();
   }
 
-  startGeoLocation() {
-    this.close = createLocationStream(location => {
-      const otherProps = {};
-      const startingProps = {};
+  renderMap() {
+    const {
+      startingLocation,
+      location,
+      radius,
+      game: { questions }
+    } = this.state;
 
-      if (this.state.loadingStartLocation) {
-        startingProps.loadingStartLocation = false;
-        startingProps.showMap = true;
-        startingProps.startingLocation = location;
-      }
-      location[0] += this.state.dev.modN;
-      location[1] += this.state.dev.modE;
-      this.setState({ location, ...startingProps, ...otherProps }, () =>
-        this.updateActiveQuestions()
-      );
+    return (
+      <Map
+        center={startingLocation}
+        zoom={15}
+        style={{ width: 800, height: 400 }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+        />
+        <Marker position={location}>
+          <Popup>
+            <span>You are here!</span>
+          </Popup>
+        </Marker>
+        {questions
+          .filter(
+            ({ selectedAnswer }) =>
+              selectedAnswer !== undefined && selectedAnswer !== -1
+          )
+          .map(({ id, coordinates: { lat, lng }, question }) => (
+            <React.Fragment key={id}>
+              <Marker position={[lat, lng]}>
+                <Popup>
+                  <span>
+                    Question:
+                    {question}
+                  </span>
+                </Popup>
+              </Marker>
+              <Circle center={[lat, lng]} radius={radius}>
+                <Popup>
+                  <span>
+                    Radius for question:
+                    {radius}
+                  </span>
+                </Popup>
+              </Circle>
+            </React.Fragment>
+          ))}
+      </Map>
+    );
+  }
+
+  onCloseModal() {
+    const {
+      activeQuestionsQueue,
+      activeQuestion,
+      ignoredQuestions
+    } = this.state;
+    this.setState(
+      {
+        modalOpen: false,
+        activeQuestionsQueue: activeQuestionsQueue.filter(
+          e => e.id !== activeQuestion.id
+        ),
+        ignoredQuestions: [...ignoredQuestions, activeQuestion],
+        activeQuestion: null
+      },
+      () => this.updateActiveQuestions()
+    );
+  }
+
+  onCloseModal2() {
+    const {
+      game: { questions }
+    } = this.statel;
+    this.setState({ modal2Open: false, activeQuestion: null }, () => {
+      this.updateActiveQuestions();
+      setTimeout(() => {
+        const end = questions.every(
+          el => el.selectedAnswer !== undefined && el.selectedAnswer !== -1
+        );
+        if (end) this.setState({ modalEndOpen: true });
+      }, 2000);
     });
   }
 
-  checkEnd() {
-    let end = true;
-    this.state.game.questions.forEach(el => {
-      if (el.selectedAnswer === undefined || el.selectedAnswer === -1)
-        end = false;
+  selectAnswer(index) {
+    const { activeQuestion } = this.state;
+    this.setState({
+      activeQuestion: { ...activeQuestion, selectedAnswer: index }
     });
-    if (end) {
-    }
   }
 
+  submitAnswer() {
+    const { game, activeQuestion } = this.state;
+    const questions = game.questions.map(question => {
+      if (question.id === activeQuestion.id) {
+        return {
+          ...question,
+          selectedAnswer: activeQuestion.selectedAnswer
+        };
+      }
+      return question;
+    });
+    this.setState({ game: { ...game, questions }, modalOpen: false }, () =>
+      setTimeout(() => this.setState({ modal2Open: true }), 200)
+    );
+  }
+
+  renderActiveQuestion() {
+    const {
+      activeQuestion: {
+        question,
+        answers,
+        selectedAnswer,
+        correctAnswer,
+        extraInformation
+      },
+      modalOpen,
+      modal2Open
+    } = this.state;
+
+    return (
+      <div>
+        <Modal open={modalOpen} onClose={this.onCloseModal.bind(this)} center>
+          <h2>{question}</h2>
+          {answers.map((el, i) => {
+            const isSelected = selectedAnswer === i;
+            const classes = classNames("answer", {
+              selectedAnswer: isSelected
+            });
+
+            return (
+              <div style={{ display: "flex" }}>
+                <button
+                  type="button"
+                  onClick={() => this.selectAnswer(i)}
+                  className={classes}
+                >
+                  {el}
+                </button>
+              </div>
+            );
+          })}
+
+          <button
+            type="button"
+            style={{ marginTop: 20 }}
+            onClick={() => this.submitAnswer()}
+          >
+            Submit
+          </button>
+        </Modal>
+        <Modal open={modal2Open} onClose={this.onCloseModal2.bind(this)} center>
+          <h2>
+            {selectedAnswer === correctAnswer
+              ? "Congratulations, that was correct!"
+              : "Bummer, that was wrong!"}
+          </h2>
+          <p>{extraInformation}</p>
+        </Modal>
+      </div>
+    );
+  }
+
+  render() {
+    const {
+      loading,
+      error,
+      game,
+      location,
+      toOverview,
+      showMap,
+      dev,
+      activeQuestion,
+      modalEndOpen
+    } = this.state;
+    const {
+      name,
+      description,
+      coordinates: { lat, lng }
+    } = game;
+
+    if (toOverview) {
+      return <Redirect to="/" />;
+    }
+    if (loading) {
+      return <h1>Loading game</h1>;
+    }
+    if (error) {
+      return <h1 style={{ color: "red" }}>{error.toString()}</h1>;
+    }
+    return (
+      <div style={{ marginLeft: 50 }}>
+        <h1>{name}</h1>
+        <h4>{description}</h4>
+        <h4>{`${location} (${lat} ${lng})`}</h4>
+        <p>
+          Your current location is: (<span>{location[0]}</span>,{" "}
+          <span>{location[1]}</span>)
+        </p>
+        {showMap && this.renderMap()}
+        <button
+          type="button"
+          onClick={() => {
+            this.setState({
+              dev: { ...dev, modE: dev.modE + 0.001 },
+              location: [location[0] + 0.001, location[1]]
+            });
+            this.updateActiveQuestions();
+          }}
+        >
+          UP
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            this.setState({
+              dev: { ...dev, modE: dev.modE - 0.001 },
+              location: [location[0] - 0.001, location[1]]
+            });
+            this.updateActiveQuestions();
+          }}
+        >
+          DOWN
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            this.setState({
+              dev: { ...dev, modN: dev.modN + 0.001 },
+              location: [location[0], location[1] + 0.001]
+            });
+            this.updateActiveQuestions();
+          }}
+        >
+          RIGHT
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            this.setState({
+              dev: { ...dev, modN: dev.modN - 0.001 },
+              location: [location[0], location[1] - 0.001]
+            });
+            this.updateActiveQuestions();
+          }}
+        >
+          LEFT
+        </button>
+        {game !== null &&
+          activeQuestion !== null &&
+          this.renderActiveQuestion()}
+        <EndModal
+          isOpen={modalEndOpen}
+          onClose={this.onCloseEndModal.bind(this)}
+          onRate={this.rateGame.bind(this)}
+        />
+      </div>
+    );
+  }
+
+  onCloseEndModal() {
+    this.setState({ modalEndOpen: false, toOverview: true });
+  }
+
+  // TODO: refactor this
   updateActiveQuestions() {
-    if (this.state.error) return;
+    const { error, location, radius, modalOpen, game } = this.state;
+    if (error) return;
+
     const isQuestionInRadius = el => {
       function getDistance(origin, destination) {
         // return distance in meters
@@ -115,17 +338,15 @@ class Play extends React.Component {
         const deltaLon = lon2 - lon1;
 
         const a =
-          Math.pow(Math.sin(deltaLat / 2), 2) +
-          Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
+          Math.sin(deltaLat / 2) ** 2 +
+          Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLon / 2) ** 2;
+
         const c = 2 * Math.asin(Math.sqrt(a));
         const EARTH_RADIUS = 6371;
         return c * EARTH_RADIUS * 1000;
       }
-      function toRadian(degree) {
-        return (degree * Math.PI) / 180;
-      }
 
-      const diff = getDistance(this.state.location, [
+      const diff = getDistance(location, [
         el.coordinates.lat,
         el.coordinates.lng
       ]);
@@ -138,13 +359,12 @@ class Play extends React.Component {
       this.state.activeQuestion === null
         ? null
         : { ...this.state.activeQuestion };
-    let modalOpen = this.state.modalOpen;
     let setNew = false;
 
     const activeQuestionSetter = () => {
       // SETTING NEW ACTIVE QUESTION IF NECESSARY
       if (!activeQuestion && activeQuestionsQueue.length > 0) {
-        for (let i = 0; i < activeQuestionsQueue.length; i++) {
+        for (let i = 0; i < activeQuestionsQueue.length; i += 1) {
           const item = activeQuestionsQueue[i];
           if (item.selectedAnswer === undefined || item.selectedAnswer === -1) {
             item.selectedAnswer = -1;
@@ -166,9 +386,9 @@ class Play extends React.Component {
       }
     };
 
-    this.state.game.questions.forEach(el => {
-      const res1 = this.isQuestionInArray(el, activeQuestionsQueue);
-      const res2 = this.isQuestionInArray(el, ignoredQuestions);
+    game.questions.forEach(el => {
+      const res1 = activeQuestionsQueue.some(question => el.id === question.id);
+      const res2 = ignoredQuestions.some(question => el.id === question.id);
 
       if (!isQuestionInRadius(el)) {
         // REMOVING ITEM FROM ACTIVE QUESTIONS QUEUE
@@ -181,7 +401,9 @@ class Play extends React.Component {
           el.id === this.state.activeQuestion.id
         ) {
           activeQuestion = null;
-          modalOpen = false;
+          this.setState({
+            modalOpen: false
+          });
         }
 
         // REMOVING ITEM FROM IGNORED QUESTIONS
@@ -210,292 +432,90 @@ class Play extends React.Component {
         {
           activeQuestion,
           activeQuestionsQueue,
-          ignoredQuestions,
-          modalOpen
+          ignoredQuestions
         },
         () => this.checkEnd()
       );
     }
   }
 
-  isQuestionInArray(question, array) {
-    for (let i = 0; i < array.length; i++) {
-      if (array[i].id === question.id) {
-        return i;
+  checkEnd() {
+    const { questions } = this.state;
+    const end = questions.every(
+      el => el.selectedAnswer !== undefined && el.selectedAnswer !== -1
+    );
+    if (end) {
+      // eslint-disable-next-line no-console
+      console.log("at the end");
+    }
+  }
+
+  startGeoLocation() {
+    this.close = createLocationStream(location => {
+      const otherProps = {};
+      const startingProps = {};
+      const { loadingStartLocation, dev } = this.state;
+
+      if (loadingStartLocation) {
+        startingProps.loadingStartLocation = false;
+        startingProps.showMap = true;
+        startingProps.startingLocation = location;
       }
-    }
-    return false;
-  }
 
-  componentWillUnmount() {
-    this.close();
-  }
+      const { modN, modE } = dev;
+      const locationWithDevOffset = [location[0] + modN, location[1] + modE];
 
-  render() {
-    const { loading, error, game } = this.state;
-    if (this.state.toOverview) {
-      return <Redirect to="/" />;
-    }
-    if (loading) {
-      return <h1>Loading game</h1>;
-    }
-    if (error) {
-      return <h1 style={{ color: "red" }}>{error.toString()}</h1>;
-    }
-    return (
-      <div style={{ marginLeft: 50 }}>
-        <h1>{game.name}</h1>
-        <h4>{game.description}</h4>
-        <h4>
-          {game.location} ({game.coordinates.lat},{game.coordinates.lng})
-        </h4>
-        <p>
-          Your current location is: ({this.state.location[0]},{" "}
-          {this.state.location[1]})
-        </p>
-        {this.state.showMap && this.renderMap()}
-        <button
-          onClick={() => {
-            this.setState({
-              dev: { ...this.state.dev, modE: this.state.dev.modE + 0.001 },
-              location: [this.state.location[0] + 0.001, this.state.location[1]]
-            });
-            this.updateActiveQuestions();
-          }}
-        >
-          UP
-        </button>
-        <button
-          onClick={() => {
-            this.setState({
-              dev: { ...this.state.dev, modE: this.state.dev.modE - 0.001 },
-              location: [this.state.location[0] - 0.001, this.state.location[1]]
-            });
-            this.updateActiveQuestions();
-          }}
-        >
-          DOWN
-        </button>
-        <button
-          onClick={() => {
-            this.setState({
-              dev: { ...this.state.dev, modN: this.state.dev.modN + 0.001 },
-              location: [this.state.location[0], this.state.location[1] + 0.001]
-            });
-            this.updateActiveQuestions();
-          }}
-        >
-          RIGHT
-        </button>
-        <button
-          onClick={() => {
-            this.setState({
-              dev: { ...this.state.dev, modN: this.state.dev.modN - 0.001 },
-              location: [this.state.location[0], this.state.location[1] - 0.001]
-            });
-            this.updateActiveQuestions();
-          }}
-        >
-          LEFT
-        </button>
-        {this.state.game !== null &&
-          this.state.activeQuestion !== null &&
-          this.renderActiveQuestion()}
-        {this.renderEndModal()}
-      </div>
-    );
-  }
-
-  renderMap() {
-    return (
-      <Map
-        center={this.state.startingLocation}
-        zoom={15}
-        style={{ width: 800, height: 400 }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={this.state.location}>
-          <Popup>
-            <span>You are here!</span>
-          </Popup>
-        </Marker>
-        {this.state.game.questions.map(el =>
-          el.selectedAnswer !== undefined && el.selectedAnswer !== -1 ? (
-            <></>
-          ) : (
-            <React.Fragment key={el.id}>
-              <Marker position={[el.coordinates.lat, el.coordinates.lng]}>
-                <Popup>
-                  <span>
-                    Question:
-                    {el.question}
-                  </span>
-                </Popup>
-              </Marker>
-              <Circle
-                center={[el.coordinates.lat, el.coordinates.lng]}
-                radius={radius}
-              >
-                <Popup>
-                  <span>
-                    Radius for question:
-                    {el.question}
-                  </span>
-                </Popup>
-              </Circle>
-            </React.Fragment>
-          )
-        )}
-      </Map>
-    );
-  }
-
-  onCloseModal() {
-    this.setState(
-      {
-        modalOpen: false,
-        activeQuestionsQueue: this.state.activeQuestionsQueue.filter(
-          e => e.id !== this.state.activeQuestion.id
-        ),
-        ignoredQuestions: [
-          ...this.state.ignoredQuestions,
-          this.state.activeQuestion
-        ],
-        activeQuestion: null
-      },
-      () => this.updateActiveQuestions()
-    );
-  }
-
-  onCloseModal2() {
-    this.setState({ modal2Open: false, activeQuestion: null }, () => {
-      this.updateActiveQuestions();
-      setTimeout(() => {
-        let end = true;
-        this.state.game.questions.forEach(question => {
-          if (
-            question.selectedAnswer === undefined ||
-            question.selectedAnswer === -1
-          )
-            end = false;
-        });
-        if (end) this.setState({ modalEndOpen: true });
-      }, 2000);
+      this.setState(
+        { location: locationWithDevOffset, ...startingProps, ...otherProps },
+        () => this.updateActiveQuestions()
+      );
     });
   }
 
-  selectAnswer(index) {
-    this.setState({
-      activeQuestion: { ...this.state.activeQuestion, selectedAnswer: index }
-    });
-  }
-
-  submitAnswer() {
-    const questions = [];
-    this.state.game.questions.forEach(el => {
-      if (el.id === this.state.activeQuestion.id) {
-        el.selectedAnswer = this.state.activeQuestion.selectedAnswer;
-      }
-      questions.push({ ...el });
-    });
-    this.setState(
-      { game: { ...this.state.game, questions }, modalOpen: false },
-      () => setTimeout(() => this.setState({ modal2Open: true }), 200)
-    );
-  }
-
-  renderActiveQuestion() {
+  async loadGame() {
     const {
-      question,
-      answers,
-      selectedAnswer,
-      correctAnswer,
-      extraInformation
-    } = this.state.activeQuestion;
-    return (
-      <div>
-        <Modal
-          open={this.state.modalOpen}
-          onClose={this.onCloseModal.bind(this)}
-          center
-        >
-          <h2>{question}</h2>
-          {answers.map((el, i) => {
-            const isSelected = selectedAnswer === i;
-            const classes = classNames("answer", {
-              selectedAnswer: isSelected
-            });
+      match: {
+        params: { id }
+      }
+    } = this.props;
 
-            return (
-              <div style={{ display: "flex" }}>
-                <span onClick={() => this.selectAnswer(i)} className={classes}>
-                  {el}
-                </span>
-              </div>
-            );
-          })}
+    try {
+      const download = await fetch(createApiUrl(`games/${id}`));
 
-          <button style={{ marginTop: 20 }} onClick={() => this.submitAnswer()}>
-            Submit
-          </button>
-        </Modal>
-        <Modal
-          open={this.state.modal2Open}
-          onClose={this.onCloseModal2.bind(this)}
-          center
-        >
-          <h2>
-            {selectedAnswer === correctAnswer
-              ? "Congratulations, that was correct!"
-              : "Bummer, that was wrong!"}
-          </h2>
-          <p>{extraInformation}</p>
-        </Modal>
-      </div>
-    );
-  }
-
-  onCloseEndModal() {
-    this.setState({ modalEndOpen: false, toOverview: true });
+      if (!download.ok) {
+        this.setState({ error: "Game could not be found." });
+        return;
+      }
+      const result = await download.json();
+      this.setState({
+        game: result
+      });
+    } catch (error) {
+      this.setState({ error });
+    } finally {
+      this.setState({
+        loading: false
+      });
+    }
   }
 
   async rateGame(rating) {
-    await fetch(createApiUrl(`games/${this.state.game.id}/rate`), {
+    const {
+      game: { id }
+    } = this.state;
+
+    await fetch(createApiUrl(`games/${id}/rate`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        gameId: this.state.game.id,
+        gameId: id,
         userId: getUserId(),
         rating
       })
     });
     this.onCloseEndModal();
-  }
-
-  renderEndModal() {
-    return (
-      <Modal
-        open={this.state.modalEndOpen}
-        onClose={this.onCloseEndModal.bind(this)}
-        center
-      >
-        <h2>Thank you for playing this game.</h2>
-        <h3>Please rate it!</h3>
-
-        <div className="score-container">
-          {range(1, 5).map(i => (
-            <span onClick={() => this.rateGame(i)} className="score-item">
-              {i}
-            </span>
-          ))}
-        </div>
-      </Modal>
-    );
   }
 }
 

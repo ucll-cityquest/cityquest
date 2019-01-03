@@ -49,7 +49,8 @@
     },
     "extends": [
       "airbnb",
-      "prettier"
+      "prettier",
+      "prettier/react"
     ],
     "plugins": [
       "prettier"
@@ -58,6 +59,7 @@
       "prettier/prettier": "error",
       "react/jsx-filename-extension": "disable",
       "react/prop-types": "disable",
+      "react/jsx-no-bind": "disable",
       "import/prefer-default-export": "disable",
       "jsx-a11y/label-has-for": "disable"
     },

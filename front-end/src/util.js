@@ -37,3 +37,7 @@ export function range(min, max, step = 1) {
 
   return array;
 }
+
+export function toRadian(degree) {
+  return (degree * Math.PI) / 180;
+}
