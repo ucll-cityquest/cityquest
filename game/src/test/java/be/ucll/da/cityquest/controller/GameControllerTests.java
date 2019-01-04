@@ -4,6 +4,7 @@ import be.ucll.da.cityquest.Application;
 import be.ucll.da.cityquest.database.GameRepository;
 import be.ucll.da.cityquest.model.Coordinates;
 import be.ucll.da.cityquest.model.Game;
+import be.ucll.da.cityquest.model.GamePreferences;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,6 +73,19 @@ public class GameControllerTests {
 
         assertThat(statusCode)
                 .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void whenAskingForRecommendationAndThereIsNoneReturnEmptyJsonObject() {
+        var randomUserId = UUID.randomUUID().toString();
+
+        final var response = restTemplate.getForEntity(
+                createURLWithPort("/games/recommended/" + randomUserId),
+                String.class
+        );
+
+        final var responseBody = response.getBody();
+        assertThat(responseBody).isEqualTo("{}");
     }
 
     @Test
